@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import easyWords from '@/assets/easy_words.txt?raw';
 import mediumWords from '@/assets/medium_words.txt?raw';
@@ -10,6 +10,9 @@ const gameStore = useGameStore();
 const router = useRouter();
 
 const countdown = ref(0);
+const roundTime = ref(0);
+const totalRoundTime = ref(0);
+let roundTimer: number | undefined;
 
 // Redirect if no current game
 if (!gameStore.isGameStarted) {
@@ -39,22 +42,27 @@ function nextRound() {
   }
 
   countdown.value = 3;
-  let timer = setInterval(() => {
+  const timer = setInterval(() => {
     countdown.value--;
     if (countdown.value <= 0) {
       clearInterval(timer);
-      gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+      startRound();
     }
   }, 1000);
+}
 
-  countdown.value = gameStore.roundDuration;
-  timer = setInterval(() => {
-    countdown.value--;
-    if (countdown.value <= 0) {
-      clearInterval(timer);
-      gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+function startRound() {
+  gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+  totalRoundTime.value = gameStore.roundDuration;
+  roundTime.value = 0;
+
+  roundTimer = setInterval(() => {
+    roundTime.value += 0.1;
+    if (roundTime.value >= totalRoundTime.value) {
+      clearInterval(roundTimer);
+      alert("Time's up!");
     }
-  }, 1000);
+  }, 100);
 }
 
 function skipWord() {
@@ -65,6 +73,11 @@ function correctWord() {
   gameStore.incrementTeamScore(gameStore.currentTeam());
   gameStore.wordIndex++;
 }
+
+const progressWidth = computed(() => {
+  if (totalRoundTime.value === 0) return 0;
+  return (roundTime.value / totalRoundTime.value) * 100;
+});
 </script>
 
 <template>
@@ -99,12 +112,16 @@ function correctWord() {
   </div>
 
   <div v-else class="game-container">
+    <div class="progress-bar" :style="{ width: progressWidth + '%' }"></div>
+    <div class="game-content">
+      <h3>{{ gameStore.currentTeam() }}</h3>
+      <div class="word">
+        <h1>{{ gameStore.words[gameStore.wordIndex] }}</h1>
+      </div>
+    </div>
+
     <div class="skip-btn" @click="skipWord"></div>
     <div class="correct-btn" @click="correctWord"></div>
-    <h3>{{ gameStore.currentTeam() }}</h3>
-    <div class="word">
-      <h1>{{ gameStore.words[gameStore.wordIndex] }}</h1>
-    </div>
   </div>
 </template>
 
@@ -165,14 +182,37 @@ function correctWord() {
 }
 
 .game-container {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  background-color: white;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.progress-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  z-index: 1;
+  transition: width 0.1s linear;
+}
+
+.game-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
   text-align: center;
   padding: 2rem;
   box-sizing: border-box;
+  color: white;
+  mix-blend-mode: difference;
 }
 
 .word {

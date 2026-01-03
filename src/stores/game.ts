@@ -15,19 +15,19 @@ export const useGameStore = defineStore('game', () => {
   const isGameStarted = ref(false);
 
   // Load state from localStorage on initialization
-  const savedState = localStorage.getItem('charades_game_state');
-  if (savedState) {
-    const parsed = JSON.parse(savedState);
-    team1Name.value = parsed.team1Name;
-    team2Name.value = parsed.team2Name;
-    team1Score.value = parsed.team1Score;
-    team2Score.value = parsed.team2Score;
-    team1RoundsPlayed.value = parsed.team1RoundsPlayed;
-    team2RoundsPlayed.value = parsed.team2RoundsPlayed;
-    roundDuration.value = parsed.roundDuration;
-    difficulty.value = parsed.difficulty;
-    isGameStarted.value = parsed.isGameStarted;
-  }
+  // const savedState = localStorage.getItem('charades_game_state');
+  // if (savedState) {
+  //   const parsed = JSON.parse(savedState);
+  //   team1Name.value = parsed.team1Name;
+  //   team2Name.value = parsed.team2Name;
+  //   team1Score.value = parsed.team1Score;
+  //   team2Score.value = parsed.team2Score;
+  //   team1RoundsPlayed.value = parsed.team1RoundsPlayed;
+  //   team2RoundsPlayed.value = parsed.team2RoundsPlayed;
+  //   roundDuration.value = parsed.roundDuration;
+  //   difficulty.value = parsed.difficulty;
+  //   isGameStarted.value = parsed.isGameStarted;
+  // }
 
   // Watch for changes and save to localStorage
   watch(
