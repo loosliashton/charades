@@ -39,7 +39,16 @@ function nextRound() {
   }
 
   countdown.value = 3;
-  const timer = setInterval(() => {
+  let timer = setInterval(() => {
+    countdown.value--;
+    if (countdown.value <= 0) {
+      clearInterval(timer);
+      gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+    }
+  }, 1000);
+
+  countdown.value = gameStore.roundDuration;
+  timer = setInterval(() => {
     countdown.value--;
     if (countdown.value <= 0) {
       clearInterval(timer);
@@ -158,13 +167,20 @@ function correctWord() {
 .game-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
   text-align: center;
   padding: 2rem;
   box-sizing: border-box;
+}
+
+.word {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .word h1 {
