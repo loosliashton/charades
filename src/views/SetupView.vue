@@ -1,26 +1,32 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useGameStore } from '@/stores/game'
-import SettingsModal from '@/components/SettingsModal.vue'
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useGameStore } from '@/stores/game';
+import SettingsModal from '@/components/SettingsModal.vue';
 
-const router = useRouter()
-const gameStore = useGameStore()
+const router = useRouter();
+const gameStore = useGameStore();
 
-const team1 = ref('')
-const team2 = ref('')
-const isSettingsOpen = ref(false)
+const team1 = ref('');
+const team2 = ref('');
+const isSettingsOpen = ref(false);
 
 const canStart = computed(() => {
-  return team1.value.trim().length > 0 && team2.value.trim().length > 0
-})
+  return (
+    team1.value.trim().length > 0 && team2.value.trim().length > 0 && team1.value !== team2.value
+  );
+});
 
 function handleStartGame() {
   if (canStart.value) {
-    gameStore.setTeamNames(team1.value, team2.value)
-    gameStore.startGame()
-    router.push({ name: 'game' })
+    gameStore.setTeamNames(team1.value, team2.value);
+    router.push({ name: 'game' });
+    gameStore.startGame();
   }
+}
+
+function clearCache() {
+  window.localStorage.clear();
 }
 </script>
 
@@ -55,6 +61,7 @@ function handleStartGame() {
       </div>
 
       <button @click="handleStartGame" :disabled="!canStart" class="start-btn">Start Game</button>
+      <button @click="clearCache()" class="reset-btn">Reset Game</button>
     </main>
 
     <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />

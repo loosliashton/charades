@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useGameStore } from '@/stores/game'
+import { ref, watch, computed } from 'vue';
+import { useGameStore } from '@/stores/game';
 
 const props = defineProps<{
-  isOpen: boolean
-}>()
+  isOpen: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'close'): void
-}>()
+  (e: 'close'): void;
+}>();
 
-const gameStore = useGameStore()
+const gameStore = useGameStore();
 
-const duration = ref(gameStore.roundDuration)
-const difficulty = ref(gameStore.difficulty)
+const duration = ref(gameStore.roundDuration);
+const difficulty = ref(gameStore.difficulty);
 
-const difficulties = ['Easy', 'Medium', 'Hard']
+const difficulties = ['Easy', 'Medium', 'Hard'];
 const difficultyIndex = computed({
   get: () => difficulties.indexOf(difficulty.value),
   set: (val) => {
-    difficulty.value = difficulties[val] || 'Medium'
+    difficulty.value = difficulties[val] || 'Medium';
   },
-})
+});
 
 watch(
   () => props.isOpen,
   (newVal) => {
     if (newVal) {
-      duration.value = gameStore.roundDuration
-      difficulty.value = gameStore.difficulty
+      duration.value = gameStore.roundDuration;
+      difficulty.value = gameStore.difficulty;
     }
   },
-)
+);
 
 function saveSettings() {
-  gameStore.setSettings(duration.value, difficulty.value)
-  emit('close')
+  gameStore.setSettings(duration.value, difficulty.value);
+  emit('close');
 }
 </script>
 
