@@ -73,6 +73,11 @@ function postRound() {
   gameStore.gameState = 'postRound';
 }
 
+function quitGame() {
+  gameStore.resetGame();
+  router.push('/');
+}
+
 function skipWord() {
   if (currentSkips.value < gameStore.freeSkips) {
     currentSkips.value++;
@@ -140,17 +145,50 @@ const progressWidth = computed(() => {
     <div class="matchup">
       <div class="team">
         <h2>{{ gameStore.team1Name }}</h2>
-        <p class="score">{{ gameStore.team1Score }}</p>
+        <div class="score-container">
+          <button
+            v-if="gameStore.currentTeam() === gameStore.team1Name"
+            class="adjust-btn"
+            @click="gameStore.decrementTeamScore(gameStore.team1Name)"
+          >
+            -
+          </button>
+          <p class="score">{{ gameStore.team1Score }}</p>
+          <button
+            v-if="gameStore.currentTeam() === gameStore.team1Name"
+            class="adjust-btn"
+            @click="gameStore.incrementTeamScore(gameStore.team1Name)"
+          >
+            +
+          </button>
+        </div>
         <p class="rounds-played">Rounds: {{ gameStore.team1RoundsPlayed }}</p>
       </div>
       <div class="vs">VS</div>
       <div class="team">
         <h2>{{ gameStore.team2Name }}</h2>
-        <p class="score">{{ gameStore.team2Score }}</p>
+        <div class="score-container">
+          <button
+            v-if="gameStore.currentTeam() === gameStore.team2Name"
+            class="adjust-btn"
+            @click="gameStore.decrementTeamScore(gameStore.team2Name)"
+          >
+            -
+          </button>
+          <p class="score">{{ gameStore.team2Score }}</p>
+          <button
+            v-if="gameStore.currentTeam() === gameStore.team2Name"
+            class="adjust-btn"
+            @click="gameStore.incrementTeamScore(gameStore.team2Name)"
+          >
+            +
+          </button>
+        </div>
         <p class="rounds-played">Rounds: {{ gameStore.team2RoundsPlayed }}</p>
       </div>
     </div>
     <div class="buttons">
+      <button @click="quitGame()" class="new-game-btn">New Game</button>
       <button @click="nextRound()" class="round-start-btn">Next Round</button>
     </div>
   </div>
@@ -334,5 +372,46 @@ const progressWidth = computed(() => {
   font-size: 1.2rem;
   color: #666;
   margin-top: 0.5rem;
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.adjust-btn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.adjust-btn:hover {
+  background: #e0e0e0;
+}
+
+.new-game-btn {
+  background: none;
+  border: 2px solid #ff4444; /* Red border for destructive action */
+  color: #ff4444;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.new-game-btn:hover {
+  background: #ff4444;
+  color: white;
 }
 </style>

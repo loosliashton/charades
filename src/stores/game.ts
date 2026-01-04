@@ -68,6 +68,11 @@ export const useGameStore = defineStore('game', () => {
 
   function resetGame() {
     gameState.value = 'intro';
+    team1Score.value = 0;
+    team2Score.value = 0;
+    team1RoundsPlayed.value = 0;
+    team2RoundsPlayed.value = 0;
+    wordIndex.value = 0;
     localStorage.removeItem('charades_game_state');
   }
 
