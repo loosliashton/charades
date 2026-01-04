@@ -40,3 +40,231 @@ treasure
 trip
 walk the dog
 wrestling
+actor
+alien
+anchor
+archer
+artist
+astronaut
+baker
+ballet
+barber
+baseball player
+basketball player
+bat
+beaver
+beekeeper
+black belt
+board game
+bodyguard
+bowling
+boxer
+brain freeze
+breakdance
+bridge
+bubble bath
+building
+camel
+camping
+castle
+caveman
+cheerleader
+chef
+chess
+chimney
+chopsticks
+clown
+coach
+conductor
+corn on the cob
+crab
+cricket
+crocodile
+dentist
+detective
+diver
+DJ
+dodgeball
+dolphin
+dragon
+drummer
+farmer
+firefighter
+flamingo
+flight attendant
+fountain
+frisbee
+giraffe
+gorilla
+hammock
+harry potter
+hip hop
+hippopotamus
+mini skirt
+childbirth
+belly dancing
+tug-of-war
+traffic jam
+human pyramid
+conga line
+firing squad
+proposal
+zoo
+airport security
+disco
+school bus
+statue of liberty
+octopus
+mount rushmore
+touchdown
+home run
+drill
+snowboarding
+braid
+doghouse
+assembly line
+relay race
+zombie
+auction
+Top Gun
+changing a tire
+karate
+frog
+Superman
+mirror
+TV remote
+bumper cars
+roller coaster
+windmills
+moonwalk
+bagpipes
+bad breath
+barbecue
+beatbox
+bird watching
+blizzard
+boomerang
+bungee jumping
+cactus
+dinosaur
+eclipse
+escalator
+explosion
+ferris wheel
+fireworks
+flashlight
+fortune cookie
+ghost
+graduation
+haircut
+hitchhike
+hot dog
+hula hoop
+hurricane
+ice cream
+jack-in-the-box
+jellyfish
+juggling
+kangaroo
+kite
+ladder
+lighthouse
+limbo
+lobster
+magician
+magnet
+makeup
+map
+marathon
+mermaid
+microscope
+microwave
+mummy
+needle
+ninja
+nutcracker
+opera singer
+origami
+painter
+pancake
+paper airplane
+parade
+parachute
+peacock
+penguin
+piano
+picnic
+pilot
+ping pong
+pizza
+planet
+playground
+pocket watch
+pogo stick
+poison ivy
+poker
+popcorn
+puppet
+quicksand
+refrigerator
+rocking chair
+rodeo
+sandwich
+santa claus
+scarecrow
+scuba diving
+seesaw
+shadow
+shark
+shopping cart
+skateboard
+skiing
+snail
+snake
+sneeze
+snowball fight
+snowman
+soap
+soccer
+starfish
+stethoscope
+submarine
+sumo wrestler
+sunburn
+sunglasses
+surfer
+sushi
+swimming pool
+sword fight
+tattoo
+tennis
+tightrope
+toilet
+toothbrush
+tornado
+traffic light
+train
+trampoline
+tricycle
+trumpet
+turtle
+umbrella
+unicycle
+unicorn
+vacuum
+vampire
+video game
+violin
+volcano
+waiter
+washing machine
+wedding
+werewolf
+wheelbarrow
+whistle
+woodpecker
+worm
+yawn
+yoga
+yo-yo
+zebra
