@@ -26,7 +26,7 @@ function loadWords() {
       : gameStore.difficulty === 'Medium'
         ? mediumWords
         : hardWords;
-  gameStore.words = rawWords.split('\r\n').sort(() => Math.random() - 0.5);
+  gameStore.words = rawWords.split('\n').sort(() => Math.random() - 0.5);
 }
 
 function nextRound() {
