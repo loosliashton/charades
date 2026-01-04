@@ -14,6 +14,27 @@ const roundTime = ref(0);
 const totalRoundTime = ref(0);
 let roundTimer: number | undefined;
 
+// Visual feedback system
+interface Feedback {
+  id: number;
+  text: string;
+  type: 'correct' | 'skip' | 'penalty';
+  x: number;
+  y: number;
+}
+const feedbacks = ref<Feedback[]>([]);
+let feedbackIdCounter = 0;
+
+function addFeedback(x: number, y: number, text: string, type: 'correct' | 'skip' | 'penalty') {
+  const id = feedbackIdCounter++;
+  feedbacks.value.push({ id, text, type, x, y });
+
+  // Remove feedback after animation (1s)
+  setTimeout(() => {
+    feedbacks.value = feedbacks.value.filter((f) => f.id !== id);
+  }, 1000);
+}
+
 // Load words based on difficulty
 if (gameStore.words.length === 0) {
   loadWords();
@@ -90,18 +111,28 @@ function quitGame() {
   router.push('/');
 }
 
-function skipWord() {
+function skipWord(event: MouseEvent) {
+  let text = 'Skip';
+  let type: 'skip' | 'penalty' = 'skip';
+
   if (gameStore.currentSkips < gameStore.freeSkips) {
     gameStore.currentSkips++;
   } else {
     gameStore.decrementTeamScore(gameStore.currentTeam());
+    text = '-1';
+    type = 'penalty';
   }
+
+  addFeedback(event.clientX, event.clientY, text, type);
+
   const word = gameStore.words[gameStore.wordIndex] || 'Unknown';
   gameStore.addWordResult(word, 'skipped');
   gameStore.wordIndex++;
 }
 
-function correctWord() {
+function correctWord(event: MouseEvent) {
+  addFeedback(event.clientX, event.clientY, 'Got it!', 'correct');
+
   gameStore.incrementTeamScore(gameStore.currentTeam());
   const word = gameStore.words[gameStore.wordIndex] || 'Unknown';
   gameStore.addWordResult(word, 'correct');
@@ -172,6 +203,17 @@ onUnmounted(() => {
       <div class="word">
         <h1>{{ gameStore.words[gameStore.wordIndex] }}</h1>
       </div>
+    </div>
+
+    <!-- Feedback Elements -->
+    <div
+      v-for="feedback in feedbacks"
+      :key="feedback.id"
+      class="feedback-item"
+      :class="feedback.type"
+      :style="{ left: feedback.x + 'px', top: feedback.y + 'px' }"
+    >
+      {{ feedback.text }}
     </div>
 
     <div class="skip-btn" @click="skipWord"></div>
@@ -266,6 +308,42 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.feedback-item {
+  position: fixed;
+  pointer-events: none;
+  font-size: 2.5rem;
+  font-weight: bold;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  animation: floatUp 1s ease-out forwards;
+}
+
+.feedback-item.correct {
+  color: #4caf50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.feedback-item.skip {
+  color: #ff9800; /* Orange for skip */
+  text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+}
+
+.feedback-item.penalty {
+  color: #f44336; /* Red for penalty */
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -150%) scale(1.5);
+  }
+}
+
 .skip-btn {
   position: fixed;
   top: 0;
