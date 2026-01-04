@@ -1,42 +1,62 @@
-# charades
+# Backwards Pantomime (Charades)
 
-This template should help get you started developing with Vue 3 in Vite.
+A web-based Charades game built with Vue 3 and Vite. Designed for mobile play with a clean, responsive interface.
 
-## Recommended IDE Setup
+## 🎮 Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Seamless Gameplay**: Simply hold your device to show your team their word!
+- **Team vs. Team**: Track scores for two teams with customizable names.
+- **Customizable Settings**:
+  - **Round Duration**: Adjust the timer to your liking.
+  - **Difficulty Levels**: Choose from Easy, Medium, and Hard word lists.
+  - **Free Skips**: Configure how many skips are allowed before penalties apply.
+- **Visual Feedback**: Distinct animations for correct guesses and skips.
+- **Score Tracking**: Automatic scoring and round management.
+- **Detailed Recaps**: View a breakdown of correct and skipped words after each round.
+- **Game State Persistence**: Accidental refreshes? No problem. The game saves your progress automatically.
+- **PWA Ready**: Installable on mobile devices for a native app-like experience with offline support.
 
-## Recommended Browser Setup
+## 🛠️ Technology Stack
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- **Framework**: [Vue 3](https://vuejs.org/) (Script Setup)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **State Management**: [Pinia](https://pinia.vuejs.org/) (with persistence)
+- **Routing**: [Vue Router](https://router.vuejs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
 
-## Type Support for `.vue` Imports in TS
+## 🚀 Project Setup
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Run the following commands to get the project up and running locally.
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+### Install Dependencies
 
 ```sh
-npm install
+npm i
 ```
 
-### Compile and Hot-Reload for Development
+### Development Server
+
+Start the development server with hot-reload:
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### Production Build
+
+Type-check, compile, and minify for production:
 
 ```sh
 npm run build
 ```
+
+## 📱 How to Play
+
+1.  **Setup**: Enter team names and adjust settings (if desired) via the gear icon.
+2.  **Start**: Click "Start Game".
+3.  **Round**:
+    - A member from the opposing team holds the device to show the acting team's word.
+    - Teammates act out the word displayed.
+    - **Correct**: Tap right side for "Got it!".
+    - **Skip**: Tap left side to skip.
+4.  **Scoring**: Points are tallied automatically. Review the round details and pass the device to the next team!
