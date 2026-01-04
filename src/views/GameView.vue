@@ -74,6 +74,7 @@ function startRound() {
     if (roundTime.value >= totalRoundTime.value) {
       clearInterval(roundTimer);
       gameStore.roundStartTime = null; // Reset for next round
+      gameStore.wordIndex++; // Move to next word
       postRound();
     }
   }, 100);

@@ -26,9 +26,11 @@ function handleResumeGame() {
 }
 
 function handleNewGame() {
-  gameStore.resetGame();
-  team1.value = '';
-  team2.value = '';
+  if (confirm('Are you sure you want to start a new game?')) {
+    gameStore.resetGame();
+    team1.value = '';
+    team2.value = '';
+  }
 }
 
 function handleStartGame() {
@@ -43,8 +45,10 @@ function handleStartGame() {
 <template>
   <div class="setup-container">
     <header>
-      <h1>Charades</h1>
-      <button @click="isSettingsOpen = true" class="settings-btn">⚙️ Settings</button>
+      <h1>Backwards Pantomime</h1>
+      <button v-if="!hasActiveGame" @click="isSettingsOpen = true" class="settings-btn">
+        ⚙️ Settings
+      </button>
     </header>
 
     <main v-if="hasActiveGame" class="active-game-prompt">
@@ -152,6 +156,7 @@ input {
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 input:focus {
