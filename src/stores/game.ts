@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
+export type GameState = 'intro' | 'countdown' | 'round' | 'postRound';
+
 export const useGameStore = defineStore('game', () => {
   const team1Name = ref('');
   const team2Name = ref('');
@@ -10,9 +12,10 @@ export const useGameStore = defineStore('game', () => {
   const team2RoundsPlayed = ref(0);
   const roundDuration = ref(60); // seconds
   const difficulty = ref('Medium'); // 'Easy', 'Medium', 'Hard'
+  const freeSkips = ref(1);
   const wordIndex = ref(0);
   const words = ref<string[]>([]);
-  const isGameStarted = ref(false);
+  const gameState = ref<GameState>('intro');
 
   // Load state from localStorage on initialization
   // const savedState = localStorage.getItem('charades_game_state');
@@ -31,7 +34,7 @@ export const useGameStore = defineStore('game', () => {
 
   // Watch for changes and save to localStorage
   watch(
-    [team1Name, team2Name, team1Score, team2Score, roundDuration, difficulty, isGameStarted],
+    [team1Name, team2Name, team1Score, team2Score, roundDuration, difficulty, gameState],
     () => {
       const stateToSave = {
         team1Name: team1Name.value,
@@ -42,7 +45,7 @@ export const useGameStore = defineStore('game', () => {
         team2RoundsPlayed: team2RoundsPlayed.value,
         roundDuration: roundDuration.value,
         difficulty: difficulty.value,
-        isGameStarted: isGameStarted.value,
+        gameState: gameState.value,
       };
       localStorage.setItem('charades_game_state', JSON.stringify(stateToSave));
     },
@@ -60,11 +63,11 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function startGame() {
-    isGameStarted.value = true;
+    gameState.value = 'intro';
   }
 
   function resetGame() {
-    isGameStarted.value = false;
+    gameState.value = 'intro';
     localStorage.removeItem('charades_game_state');
   }
 
@@ -113,9 +116,10 @@ export const useGameStore = defineStore('game', () => {
     team2RoundsPlayed,
     roundDuration,
     difficulty,
+    freeSkips,
     wordIndex,
     words,
-    isGameStarted,
+    gameState,
     setTeamNames,
     setSettings,
     startGame,

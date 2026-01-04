@@ -61,6 +61,18 @@ function saveSettings() {
         />
       </div>
 
+      <div class="setting-group">
+        <label for="freeSkips">Free Skips: {{ gameStore.freeSkips }}</label>
+        <input
+          id="freeSkips"
+          type="range"
+          v-model.number="gameStore.freeSkips"
+          min="0"
+          max="2"
+          step="1"
+        />
+      </div>
+
       <div class="modal-actions">
         <button @click="$emit('close')" class="cancel-btn">Cancel</button>
         <button @click="saveSettings" class="save-btn">Save</button>

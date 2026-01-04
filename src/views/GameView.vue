@@ -13,9 +13,10 @@ const countdown = ref(0);
 const roundTime = ref(0);
 const totalRoundTime = ref(0);
 let roundTimer: number | undefined;
+let currentSkips = ref(0);
 
 // Redirect if no current game
-if (!gameStore.isGameStarted) {
+if (gameStore.gameState !== 'intro') {
   router.push('/');
 }
 
@@ -41,6 +42,7 @@ function nextRound() {
     return;
   }
 
+  gameStore.gameState = 'countdown';
   countdown.value = 3;
   const timer = setInterval(() => {
     countdown.value--;
@@ -52,20 +54,31 @@ function nextRound() {
 }
 
 function startRound() {
+  gameStore.gameState = 'round';
   gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
   totalRoundTime.value = gameStore.roundDuration;
   roundTime.value = 0;
+  currentSkips.value = 0;
 
   roundTimer = setInterval(() => {
     roundTime.value += 0.1;
     if (roundTime.value >= totalRoundTime.value) {
       clearInterval(roundTimer);
-      alert("Time's up!");
+      postRound();
     }
   }, 100);
 }
 
+function postRound() {
+  gameStore.gameState = 'postRound';
+}
+
 function skipWord() {
+  if (currentSkips.value < gameStore.freeSkips) {
+    currentSkips.value++;
+  } else {
+    gameStore.decrementTeamScore(gameStore.currentTeam());
+  }
   gameStore.wordIndex++;
 }
 
@@ -81,14 +94,7 @@ const progressWidth = computed(() => {
 </script>
 
 <template>
-  <div v-if="countdown > 0" class="countdown-overlay">
-    <div class="countdown-number">{{ countdown }}</div>
-  </div>
-
-  <div
-    v-else-if="gameStore.team1RoundsPlayed === 0 && gameStore.team2RoundsPlayed === 0"
-    class="pre-game-container"
-  >
+  <div v-if="gameStore.gameState === 'intro'" class="pre-game-container">
     <h1>Game On!</h1>
     <div class="matchup">
       <div class="team">
@@ -103,6 +109,7 @@ const progressWidth = computed(() => {
     <div class="info">
       <p>Duration: {{ gameStore.roundDuration }}s</p>
       <p>Difficulty: {{ gameStore.difficulty }}</p>
+      <p>Free Skips: {{ gameStore.freeSkips }}</p>
     </div>
 
     <div class="buttons">
@@ -111,7 +118,11 @@ const progressWidth = computed(() => {
     </div>
   </div>
 
-  <div v-else class="game-container">
+  <div v-else-if="gameStore.gameState === 'countdown'" class="countdown-overlay">
+    <div class="countdown-number">{{ countdown }}</div>
+  </div>
+
+  <div v-else-if="gameStore.gameState === 'round'" class="game-container">
     <div class="progress-bar" :style="{ width: progressWidth + '%' }"></div>
     <div class="game-content">
       <h3>{{ gameStore.currentTeam() }}</h3>
@@ -122,6 +133,26 @@ const progressWidth = computed(() => {
 
     <div class="skip-btn" @click="skipWord"></div>
     <div class="correct-btn" @click="correctWord"></div>
+  </div>
+
+  <div v-else-if="gameStore.gameState === 'postRound'" class="post-round-container">
+    <h1>Round Over</h1>
+    <div class="matchup">
+      <div class="team">
+        <h2>{{ gameStore.team1Name }}</h2>
+        <p class="score">{{ gameStore.team1Score }}</p>
+        <p class="rounds-played">Rounds: {{ gameStore.team1RoundsPlayed }}</p>
+      </div>
+      <div class="vs">VS</div>
+      <div class="team">
+        <h2>{{ gameStore.team2Name }}</h2>
+        <p class="score">{{ gameStore.team2Score }}</p>
+        <p class="rounds-played">Rounds: {{ gameStore.team2RoundsPlayed }}</p>
+      </div>
+    </div>
+    <div class="buttons">
+      <button @click="nextRound()" class="round-start-btn">Next Round</button>
+    </div>
   </div>
 </template>
 
@@ -279,5 +310,29 @@ const progressWidth = computed(() => {
   display: flex;
   justify-content: center;
   gap: 1rem;
+}
+
+.post-round-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  text-align: center;
+  background-color: white;
+}
+
+.score {
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+}
+
+.rounds-played {
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 0.5rem;
 }
 </style>
