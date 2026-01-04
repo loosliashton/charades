@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
-export type GameState = 'intro' | 'countdown' | 'round' | 'postRound';
-
 export const useGameStore = defineStore(
   'game',
   () => {
@@ -14,11 +12,22 @@ export const useGameStore = defineStore(
     const team2RoundsPlayed = ref(0);
     const roundDuration = ref(60); // seconds
     const difficulty = ref('Medium'); // 'Easy', 'Medium', 'Hard'
+    const currentSkips = ref(0);
     const freeSkips = ref(1);
     const wordIndex = ref(0);
     const words = ref<string[]>([]);
     const gameState = ref<GameState>('intro');
     const roundStartTime = ref<number | null>(null);
+    const lastRoundWords = ref<{ word: string; status: 'correct' | 'skipped' }[]>([]);
+
+    function addWordResult(word: string, status: 'correct' | 'skipped') {
+      lastRoundWords.value.push({ word, status });
+    }
+
+    function resetRoundStats() {
+      lastRoundWords.value = [];
+      currentSkips.value = 0;
+    }
 
     function setTeamNames(t1: string, t2: string) {
       team1Name.value = t1;
@@ -91,11 +100,13 @@ export const useGameStore = defineStore(
       team2RoundsPlayed,
       roundDuration,
       difficulty,
+      currentSkips,
       freeSkips,
       wordIndex,
       words,
       gameState,
       roundStartTime,
+      lastRoundWords,
       setTeamNames,
       setSettings,
       startGame,
@@ -105,7 +116,16 @@ export const useGameStore = defineStore(
       incrementTeamScore,
       decrementTeamScore,
       incrementTeamRoundsPlayed,
+      addWordResult,
+      resetRoundStats,
     };
   },
   { persist: true },
 );
+
+export type WordResult = {
+  word: string;
+  status: 'correct' | 'skipped';
+};
+
+export type GameState = 'intro' | 'countdown' | 'round' | 'postRound';

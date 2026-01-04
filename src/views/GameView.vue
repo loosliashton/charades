@@ -13,7 +13,6 @@ const countdown = ref(0);
 const roundTime = ref(0);
 const totalRoundTime = ref(0);
 let roundTimer: number | undefined;
-let currentSkips = ref(0);
 
 // Load words based on difficulty
 if (gameStore.words.length === 0) {
@@ -59,11 +58,11 @@ function startRound() {
   if (!gameStore.roundStartTime) {
     gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
     gameStore.roundStartTime = Date.now();
+    gameStore.resetRoundStats();
   }
 
   totalRoundTime.value = gameStore.roundDuration;
   roundTime.value = (Date.now() - gameStore.roundStartTime) / 1000;
-  currentSkips.value = 0;
 
   if (roundTimer) clearInterval(roundTimer);
   roundTimer = setInterval(() => {
@@ -80,10 +79,6 @@ function startRound() {
   }, 100);
 }
 
-onUnmounted(() => {
-  if (roundTimer) clearInterval(roundTimer);
-});
-
 function postRound() {
   gameStore.gameState = 'postRound';
 }
@@ -96,17 +91,31 @@ function quitGame() {
 }
 
 function skipWord() {
-  if (currentSkips.value < gameStore.freeSkips) {
-    currentSkips.value++;
+  if (gameStore.currentSkips < gameStore.freeSkips) {
+    gameStore.currentSkips++;
   } else {
     gameStore.decrementTeamScore(gameStore.currentTeam());
   }
+  const word = gameStore.words[gameStore.wordIndex] || 'Unknown';
+  gameStore.addWordResult(word, 'skipped');
   gameStore.wordIndex++;
 }
 
 function correctWord() {
   gameStore.incrementTeamScore(gameStore.currentTeam());
+  const word = gameStore.words[gameStore.wordIndex] || 'Unknown';
+  gameStore.addWordResult(word, 'correct');
   gameStore.wordIndex++;
+}
+
+const showDetails = ref(false);
+const activeTeamForDetails = ref('');
+
+function showScoreDetails(teamName: string) {
+  if (teamName === gameStore.currentTeam()) {
+    activeTeamForDetails.value = teamName;
+    showDetails.value = true;
+  }
 }
 
 const progressWidth = computed(() => {
@@ -120,6 +129,10 @@ onMounted(() => {
   } else if (gameStore.gameState === 'countdown') {
     startCountdown();
   }
+});
+
+onUnmounted(() => {
+  if (roundTimer) clearInterval(roundTimer);
 });
 </script>
 
@@ -178,7 +191,13 @@ onMounted(() => {
           >
             -
           </button>
-          <p class="score">{{ gameStore.team1Score }}</p>
+          <p
+            class="score"
+            :class="{ clickable: gameStore.currentTeam() === gameStore.team1Name }"
+            @click="showScoreDetails(gameStore.team1Name)"
+          >
+            {{ gameStore.team1Score }}
+          </p>
           <button
             v-if="gameStore.currentTeam() === gameStore.team1Name"
             class="adjust-btn"
@@ -200,7 +219,13 @@ onMounted(() => {
           >
             -
           </button>
-          <p class="score">{{ gameStore.team2Score }}</p>
+          <p
+            class="score"
+            :class="{ clickable: gameStore.currentTeam() === gameStore.team2Name }"
+            @click="showScoreDetails(gameStore.team2Name)"
+          >
+            {{ gameStore.team2Score }}
+          </p>
           <button
             v-if="gameStore.currentTeam() === gameStore.team2Name"
             class="adjust-btn"
@@ -215,6 +240,27 @@ onMounted(() => {
     <div class="buttons">
       <button @click="quitGame()" class="new-game-btn">New Game</button>
       <button @click="nextRound()" class="round-start-btn">Next Round</button>
+    </div>
+  </div>
+
+  <div v-if="showDetails" class="details-overlay" @click.self="showDetails = false">
+    <div class="details-modal">
+      <h2>Round Details</h2>
+      <div class="words-list">
+        <div
+          v-for="(result, index) in gameStore.lastRoundWords"
+          :key="index"
+          class="word-item"
+          :class="result.status"
+        >
+          <span class="word-text">{{ result.word }}</span>
+          <span class="status-icon">
+            <span v-if="result.status === 'correct'">✓</span>
+            <span v-else>—</span>
+          </span>
+        </div>
+      </div>
+      <button class="close-btn" @click="showDetails = false">Close</button>
     </div>
   </div>
 </template>
@@ -438,5 +484,95 @@ onMounted(() => {
 .new-game-btn:hover {
   background: #ff4444;
   color: white;
+}
+
+.score.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 8px;
+}
+
+.details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  backdrop-filter: blur(4px);
+}
+
+.details-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.details-modal h2 {
+  margin: 0 0 1.5rem;
+  color: #333;
+}
+
+.words-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.word-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-size: 1.2rem;
+}
+
+.word-item.correct {
+  background: #e6f4ea;
+  color: #1e8e3e;
+}
+
+.word-item.skipped {
+  background: #fce8e6;
+  color: #d93025;
+}
+
+.word-text {
+  font-weight: 500;
+}
+
+.status-icon {
+  font-weight: bold;
+}
+
+.close-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: #555;
 }
 </style>
