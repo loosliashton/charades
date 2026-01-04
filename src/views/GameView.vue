@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import easyWords from '@/assets/easy_words.txt?raw';
 import mediumWords from '@/assets/medium_words.txt?raw';
@@ -15,13 +15,10 @@ const totalRoundTime = ref(0);
 let roundTimer: number | undefined;
 let currentSkips = ref(0);
 
-// Redirect if no current game
-if (gameStore.gameState !== 'intro') {
-  router.push('/');
-}
-
 // Load words based on difficulty
-loadWords();
+if (gameStore.words.length === 0) {
+  loadWords();
+}
 
 function loadWords() {
   const rawWords: string =
@@ -30,9 +27,7 @@ function loadWords() {
       : gameStore.difficulty === 'Medium'
         ? mediumWords
         : hardWords;
-  gameStore.words = rawWords.split('\r\n');
-  // Shuffle words
-  gameStore.words.sort(() => Math.random() - 0.5);
+  gameStore.words = rawWords.split('\r\n').sort(() => Math.random() - 0.5);
 }
 
 function nextRound() {
@@ -43,6 +38,10 @@ function nextRound() {
   }
 
   gameStore.gameState = 'countdown';
+  startCountdown();
+}
+
+function startCountdown() {
   countdown.value = 3;
   const timer = setInterval(() => {
     countdown.value--;
@@ -55,25 +54,42 @@ function nextRound() {
 
 function startRound() {
   gameStore.gameState = 'round';
-  gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+  // If we don't have a start time (new round), set it.
+  // If we do (resuming), keep it.
+  if (!gameStore.roundStartTime) {
+    gameStore.incrementTeamRoundsPlayed(gameStore.nextTeam());
+    gameStore.roundStartTime = Date.now();
+  }
+
   totalRoundTime.value = gameStore.roundDuration;
-  roundTime.value = 0;
+  roundTime.value = (Date.now() - gameStore.roundStartTime) / 1000;
   currentSkips.value = 0;
 
+  if (roundTimer) clearInterval(roundTimer);
   roundTimer = setInterval(() => {
-    roundTime.value += 0.1;
+    if (!gameStore.roundStartTime) return;
+    const elapsed = (Date.now() - gameStore.roundStartTime) / 1000;
+    roundTime.value = elapsed;
+
     if (roundTime.value >= totalRoundTime.value) {
       clearInterval(roundTimer);
+      gameStore.roundStartTime = null; // Reset for next round
       postRound();
     }
   }, 100);
 }
+
+onUnmounted(() => {
+  if (roundTimer) clearInterval(roundTimer);
+});
 
 function postRound() {
   gameStore.gameState = 'postRound';
 }
 
 function quitGame() {
+  const isSure = confirm('Are you sure you want to quit the game?');
+  if (!isSure) return;
   gameStore.resetGame();
   router.push('/');
 }
@@ -94,7 +110,15 @@ function correctWord() {
 
 const progressWidth = computed(() => {
   if (totalRoundTime.value === 0) return 0;
-  return (roundTime.value / totalRoundTime.value) * 100;
+  return Math.min((roundTime.value / totalRoundTime.value) * 100, 100);
+});
+
+onMounted(() => {
+  if (gameStore.gameState === 'round') {
+    startRound();
+  } else if (gameStore.gameState === 'countdown') {
+    startCountdown();
+  }
 });
 </script>
 

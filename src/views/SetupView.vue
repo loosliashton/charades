@@ -17,16 +17,26 @@ const canStart = computed(() => {
   );
 });
 
+const hasActiveGame = computed(() => {
+  return gameStore.gameState !== 'intro';
+});
+
+function handleResumeGame() {
+  router.push({ name: 'game' });
+}
+
+function handleNewGame() {
+  gameStore.resetGame();
+  team1.value = '';
+  team2.value = '';
+}
+
 function handleStartGame() {
   if (canStart.value) {
     gameStore.setTeamNames(team1.value, team2.value);
     router.push({ name: 'game' });
     gameStore.startGame();
   }
-}
-
-function clearCache() {
-  window.localStorage.clear();
 }
 </script>
 
@@ -37,7 +47,19 @@ function clearCache() {
       <button @click="isSettingsOpen = true" class="settings-btn">⚙️ Settings</button>
     </header>
 
-    <main>
+    <main v-if="hasActiveGame" class="active-game-prompt">
+      <div class="matchup-preview">
+        <h2>Game in Progress</h2>
+        <p class="teams">{{ gameStore.team1Name }} vs {{ gameStore.team2Name }}</p>
+        <p class="score">{{ gameStore.team1Score }} - {{ gameStore.team2Score }}</p>
+      </div>
+      <div class="action-buttons">
+        <button @click="handleResumeGame" class="resume-btn">Resume Game</button>
+        <button @click="handleNewGame" class="new-game-btn">New Game</button>
+      </div>
+    </main>
+
+    <main v-else>
       <div class="team-input-group">
         <div class="input-wrapper">
           <label for="team1">Team 1 Name</label>
@@ -61,7 +83,6 @@ function clearCache() {
       </div>
 
       <button @click="handleStartGame" :disabled="!canStart" class="start-btn">Start Game</button>
-      <button @click="clearCache()" class="reset-btn">Reset Game</button>
     </main>
 
     <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />
@@ -167,5 +188,71 @@ input:focus {
 
 .start-btn:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.active-game-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.matchup-preview {
+  background: #f9f9f9;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.matchup-preview h2 {
+  color: #4caf50;
+  margin-top: 0;
+}
+
+.teams {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.score {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+.resume-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 1rem;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.new-game-btn {
+  background-color: white;
+  color: #ff4444;
+  border: 2px solid #ff4444;
+  padding: 1rem;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.new-game-btn:hover {
+  background-color: #fff0f0;
 }
 </style>
