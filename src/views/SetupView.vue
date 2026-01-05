@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/game';
 import SettingsModal from '@/components/SettingsModal.vue';
+import HowToPlayModal from '@/components/HowToPlayModal.vue';
 
 const router = useRouter();
 const gameStore = useGameStore();
@@ -10,6 +11,7 @@ const gameStore = useGameStore();
 const team1 = ref('');
 const team2 = ref('');
 const isSettingsOpen = ref(false);
+const isHowToPlayOpen = ref(false);
 
 const canStart = computed(() => {
   return (
@@ -46,9 +48,16 @@ function handleStartGame() {
   <div class="setup-container">
     <header>
       <h1>Backwards Pantomime</h1>
-      <button v-if="!hasActiveGame" @click="isSettingsOpen = true" class="settings-btn">
-        ⚙️ Settings
-      </button>
+      <div class="header-buttons">
+        <button @click="isHowToPlayOpen = true" class="icon-btn help-btn">
+          <span class="icon">❓</span>
+          <span class="label">How to Play</span>
+        </button>
+        <button v-if="!hasActiveGame" @click="isSettingsOpen = true" class="icon-btn settings-btn">
+          <span class="icon">⚙️</span>
+          <span class="label">Settings</span>
+        </button>
+      </div>
     </header>
 
     <main v-if="hasActiveGame" class="active-game-prompt">
@@ -58,8 +67,8 @@ function handleStartGame() {
         <p class="score">{{ gameStore.team1Score }} - {{ gameStore.team2Score }}</p>
       </div>
       <div class="action-buttons">
-        <button @click="handleResumeGame" class="resume-btn">Resume Game</button>
-        <button @click="handleNewGame" class="new-game-btn">New Game</button>
+        <button @click="handleResumeGame" class="btn btn-pill btn-primary">Resume Game</button>
+        <button @click="handleNewGame" class="btn btn-pill btn-danger">New Game</button>
       </div>
     </main>
 
@@ -86,10 +95,13 @@ function handleStartGame() {
         </div>
       </div>
 
-      <button @click="handleStartGame" :disabled="!canStart" class="start-btn">Start Game</button>
+      <button @click="handleStartGame" :disabled="!canStart" class="btn btn-pill btn-primary">
+        Start Game
+      </button>
     </main>
 
     <SettingsModal :is-open="isSettingsOpen" @close="isSettingsOpen = false" />
+    <HowToPlayModal :is-open="isHowToPlayOpen" @close="isHowToPlayOpen = false" />
   </div>
 </template>
 
@@ -102,9 +114,12 @@ function handleStartGame() {
 }
 
 header {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-bottom: 3rem;
+  gap: 1rem;
 }
 
 h1 {
@@ -113,18 +128,50 @@ h1 {
   margin: 0;
 }
 
-.settings-btn {
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.icon-btn {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+  width: auto;
+  height: auto;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  color: #555;
+  font-weight: bold;
 }
 
-.settings-btn:hover {
+.icon-btn:hover {
   background-color: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.98);
+}
+
+.icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.label {
+  font-size: 1rem;
 }
 
 .team-input-group {
@@ -162,37 +209,6 @@ input {
 input:focus {
   border-color: #4caf50;
   outline: none;
-}
-
-.start-btn {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 1rem 3rem;
-  font-size: 1.2rem;
-  border-radius: 50px;
-  cursor: pointer;
-  transition:
-    transform 0.1s,
-    opacity 0.2s;
-  font-weight: bold;
-  box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
-}
-
-.start-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.start-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background-color: #45a049;
-}
-
-.start-btn:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .active-game-prompt {
@@ -233,31 +249,5 @@ input:focus {
   gap: 1rem;
   width: 100%;
   max-width: 300px;
-}
-
-.resume-btn {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1.2rem;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.new-game-btn {
-  background-color: white;
-  color: #ff4444;
-  border: 2px solid #ff4444;
-  padding: 1rem;
-  font-size: 1.2rem;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.new-game-btn:hover {
-  background-color: #fff0f0;
 }
 </style>

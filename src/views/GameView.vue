@@ -187,8 +187,8 @@ onUnmounted(() => {
     </div>
 
     <div class="buttons">
-      <button @click="router.push('/')" class="back-btn">Back to Setup</button>
-      <button @click="nextRound()" class="round-start-btn">Start Round</button>
+      <button @click="router.push('/')" class="btn btn-pill btn-secondary">Back to Setup</button>
+      <button @click="nextRound()" class="btn btn-pill btn-primary">Start Round</button>
     </div>
   </div>
 
@@ -280,8 +280,8 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="buttons">
-      <button @click="quitGame()" class="new-game-btn">New Game</button>
-      <button @click="nextRound()" class="round-start-btn">Next Round</button>
+      <button @click="quitGame()" class="btn btn-pill btn-danger">New Game</button>
+      <button @click="nextRound()" class="btn btn-pill btn-primary">Next Round</button>
     </div>
   </div>
 
@@ -477,22 +477,6 @@ onUnmounted(() => {
   color: #666;
 }
 
-.back-btn {
-  background: none;
-  border: 2px solid #ddd;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.round-start-btn {
-  background-color: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .buttons {
   display: flex;
   justify-content: center;
@@ -534,34 +518,20 @@ onUnmounted(() => {
   background: #f0f0f0;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   font-size: 1.5rem;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #333;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .adjust-btn:hover {
   background: #e0e0e0;
-}
-
-.new-game-btn {
-  background: none;
-  border: 2px solid #ff4444; /* Red border for destructive action */
-  color: #ff4444;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.new-game-btn:hover {
-  background: #ff4444;
-  color: white;
 }
 
 .score.clickable {
@@ -647,10 +617,18 @@ onUnmounted(() => {
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  font-weight: bold;
 }
 
 .close-btn:hover {
   background: #555;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn:active {
+  transform: translateY(0);
 }
 </style>
