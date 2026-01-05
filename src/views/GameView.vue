@@ -14,6 +14,12 @@ const roundTime = ref(0);
 const totalRoundTime = ref(0);
 let roundTimer: number | undefined;
 
+// Sound effects
+function playSound(filename: string) {
+  const audio = new Audio(`/sounds/${filename}`);
+  audio.play().catch((e) => console.warn('Error playing sound:', e));
+}
+
 // Visual feedback system
 interface Feedback {
   id: number;
@@ -62,14 +68,22 @@ function nextRound() {
 }
 
 function startCountdown() {
-  countdown.value = 3;
-  const timer = setInterval(() => {
+  countdown.value = 4;
+  let timer: number;
+
+  const tick = () => {
     countdown.value--;
-    if (countdown.value <= 0) {
+    if (countdown.value > 0) {
+      playSound('low.mp3');
+    } else {
       clearInterval(timer);
+      playSound('high.mp3');
       startRound();
     }
-  }, 1000);
+  };
+
+  tick();
+  timer = setInterval(tick, 1000);
 }
 
 function startRound() {
@@ -92,6 +106,7 @@ function startRound() {
     roundTime.value = elapsed;
 
     if (roundTime.value >= totalRoundTime.value) {
+      playSound('round_finish.mp3');
       clearInterval(roundTimer);
       gameStore.roundStartTime = null; // Reset for next round
       gameStore.wordIndex++; // Move to next word
@@ -123,6 +138,7 @@ function skipWord(event: MouseEvent) {
     type = 'penalty';
   }
 
+  playSound('skip.mp3');
   addFeedback(event.clientX, event.clientY, text, type);
 
   const word = gameStore.words[gameStore.wordIndex] || 'Unknown';
@@ -131,6 +147,7 @@ function skipWord(event: MouseEvent) {
 }
 
 function correctWord(event: MouseEvent) {
+  playSound('correct.mp3');
   addFeedback(event.clientX, event.clientY, 'Got it!', 'correct');
 
   gameStore.incrementTeamScore(gameStore.currentTeam());
